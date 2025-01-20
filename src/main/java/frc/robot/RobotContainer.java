@@ -14,15 +14,25 @@ import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.RepeatCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
+import frc.robot.Constants.IntakextenderConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.commands.SwerveJoystickCmd;
-import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
+import frc.robot.subsystems.Roller.Intake.RealIntake;
+import frc.robot.subsystems.Roller.Intake.Intake;
+import frc.robot.subsystems.Roller.Rollers;
+import frc.robot.subsystems.Roller.Rollers.Rollerstate;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import static edu.wpi.first.wpilibj2.command.Commands.runOnce;
+import frc.robot.commands.ShooterCommand;
+
+
 
 
 public class RobotContainer {
@@ -30,9 +40,8 @@ public class RobotContainer {
 
 
     private final SwerveSubsystem swerveSubsystem = new SwerveSubsystem();
-
-    private final IntakeSubsystem IntakeSubsystem = new IntakeSubsystem();
-
+    private final CommandXboxController driverJoystick = new CommandXboxController(0);
+    
     private final Joystick driverJoytick = new Joystick(OIConstants.kDriverControllerPort);
 
     public RobotContainer() {
@@ -43,13 +52,19 @@ public class RobotContainer {
                 () -> -driverJoytick.getRawAxis(OIConstants.kDriverRotAxis),
                 () -> false));
 
+                
+
         configureButtonBindings();
     }
+    
 
     private void configureButtonBindings() {
         new JoystickButton(driverJoytick, 2).onTrue(new InstantCommand(swerveSubsystem::zeroHeading));
-        new JoystickButton(driverJoytick, 1).onTrue(new InstantCommand(IntakeSubsystem::load));
-        new JoystickButton(driverJoytick, 3).onTrue(new InstantCommand(IntakeSubsystem::purge));
+        driverJoystick.leftTrigger(IntakextenderConstants.kIntakeDeadband).whileTrue(new RepeatCommand(Rollers.Rollerstate.setStateCommand(Rollerstate.INTAKING)));
+    driverJoystick.leftTrigger(IntakextenderConstants.kIntakeDeadband).onFalse(runOnce(() -> Rollers.Rollerstate.stopIfNotBusy()));
+    driverJoystick.a().whileTrue(Rollers.Rollerstate.setStateCommand(Rollers.Rollerstate.EJECTING));
+    driverJoystick.a().onFalse(runOnce(() -> Rollers.stopIfNotBusy()));
+
     }
 
 public Command getAutonomousCommand() {
