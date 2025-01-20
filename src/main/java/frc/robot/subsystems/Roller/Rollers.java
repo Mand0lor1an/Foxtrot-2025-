@@ -78,7 +78,8 @@ public class Rollers extends SubsystemBase{
                     break;
             }
    Logger.recordOutput("Rollers/State", state.toString());
-        SmartDashboard.putString("Roller State", state.toString());     
+        SmartDashboard.putString("Roller State", state.toString()); 
+        
 }
 
 public Command setStateCommand(Rollers.Rollerstate state) {

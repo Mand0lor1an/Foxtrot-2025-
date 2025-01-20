@@ -1,36 +1,21 @@
 package frc.robot;
 
-import java.util.List;
-
-import edu.wpi.first.math.controller.HolonomicDriveController;
-import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.trajectory.Trajectory;
-import edu.wpi.first.math.trajectory.TrajectoryConfig;
-import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RepeatCommand;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import frc.robot.Constants.AutoConstants;
-import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.IntakextenderConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.commands.SwerveJoystickCmd;
+import frc.robot.subsystems.BeamBreak;
 import frc.robot.subsystems.SwerveSubsystem;
-import frc.robot.subsystems.Roller.Intake.RealIntake;
 import frc.robot.subsystems.Roller.Intake.Intake;
 import frc.robot.subsystems.Roller.Rollers;
 import frc.robot.subsystems.Roller.Rollers.Rollerstate;
+import frc.robot.subsystems.Roller.Extender.Extender;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import static edu.wpi.first.wpilibj2.command.Commands.runOnce;
-import frc.robot.commands.ShooterCommand;
 
 
 
@@ -39,20 +24,28 @@ public class RobotContainer {
 
 
 
+
     private final SwerveSubsystem swerveSubsystem = new SwerveSubsystem();
     private final CommandXboxController driverJoystick = new CommandXboxController(0);
     
     private final Joystick driverJoytick = new Joystick(OIConstants.kDriverControllerPort);
-
-    public RobotContainer() {
-        swerveSubsystem.setDefaultCommand(new SwerveJoystickCmd(
-                swerveSubsystem,
-                () -> -driverJoytick.getRawAxis(OIConstants.kDriverYAxis),
-                () -> -driverJoytick.getRawAxis(OIConstants.kDriverXAxis),
-                () -> -driverJoytick.getRawAxis(OIConstants.kDriverRotAxis),
-                () -> false));
-
+    private Intake Intake;
+    private BeamBreak BeamBreak;
+    private Extender Extender;
+    private Rollers Rollers;
                 
+                    public RobotContainer() {
+                        swerveSubsystem.setDefaultCommand(new SwerveJoystickCmd(
+                                swerveSubsystem,
+                                () -> -driverJoytick.getRawAxis(OIConstants.kDriverYAxis),
+                                () -> -driverJoytick.getRawAxis(OIConstants.kDriverXAxis),
+                                () -> -driverJoytick.getRawAxis(OIConstants.kDriverRotAxis),
+                                () -> false));
+                
+                                Extender = frc.robot.subsystems.Roller.Extender.Extender.create();
+                            Intake = frc.robot.subsystems.Roller.Intake.Intake.create();
+                        BeamBreak = new BeamBreak();
+                    Rollers = new Rollers(Extender, Intake, BeamBreak);
 
         configureButtonBindings();
     }
@@ -60,15 +53,16 @@ public class RobotContainer {
 
     private void configureButtonBindings() {
         new JoystickButton(driverJoytick, 2).onTrue(new InstantCommand(swerveSubsystem::zeroHeading));
-        driverJoystick.leftTrigger(IntakextenderConstants.kIntakeDeadband).whileTrue(new RepeatCommand(Rollers.Rollerstate.setStateCommand(Rollerstate.INTAKING)));
-    driverJoystick.leftTrigger(IntakextenderConstants.kIntakeDeadband).onFalse(runOnce(() -> Rollers.Rollerstate.stopIfNotBusy()));
-    driverJoystick.a().whileTrue(Rollers.Rollerstate.setStateCommand(Rollers.Rollerstate.EJECTING));
+        driverJoystick.leftTrigger(IntakextenderConstants.kIntakeDeadband).whileTrue(new RepeatCommand(Rollers.setStateCommand(Rollerstate.INTAKING)));
+    driverJoystick.leftTrigger(IntakextenderConstants.kIntakeDeadband).onFalse(runOnce(() -> Rollers.stopIfNotBusy()));
+    driverJoystick.a().whileTrue(Rollers.setStateCommand(Rollerstate.EJECTING));
     driverJoystick.a().onFalse(runOnce(() -> Rollers.stopIfNotBusy()));
 
     }
 
 public Command getAutonomousCommand() {
-    TrajectoryConfig trajectoryConfig = new TrajectoryConfig(
+        return null;
+    /*TrajectoryConfig trajectoryConfig = new TrajectoryConfig(
             AutoConstants.kMaxSpeedMetersPerSecond,
             AutoConstants.kMaxAccelerationMetersPerSecondSquared)
             .setKinematics(DriveConstants.kDriveKinematics);
@@ -101,7 +95,7 @@ public Command getAutonomousCommand() {
     return new SequentialCommandGroup(
             new InstantCommand(() -> swerveSubsystem.resetOdometry(trajectory.getInitialPose())),
             swerveControllerCommand,
-            new InstantCommand(() -> swerveSubsystem.stopModules()));
+            new InstantCommand(() -> swerveSubsystem.stopModules()));*/
 }
 
 }
