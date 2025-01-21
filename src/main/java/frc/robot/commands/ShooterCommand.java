@@ -68,7 +68,7 @@ public class ShooterCommand extends Command{
                 break;
             case PREPARE:
                 if (timeElapsed < 0.1) {
-                    rollers.state = Rollerstate.INDEXING;
+                    rollers.state = Rollerstate.INTAKING;
                 } else {
                     state = State.SHOOT;
                 }

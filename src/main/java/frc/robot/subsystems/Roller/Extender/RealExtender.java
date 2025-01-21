@@ -5,7 +5,7 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
 public class RealExtender implements ExtenderIO{
-  private static final int ExtenderMotorId = 0;
+  private static final int ExtenderMotorId = 62;
   private static final boolean ExtenderMotorReversed = false;
     private final SparkMax extenderMotor;{
         extenderMotor = new SparkMax(ExtenderMotorId, MotorType.kBrushless);

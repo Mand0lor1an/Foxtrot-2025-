@@ -8,7 +8,7 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 
 public class RealIntake implements IntakeIO{
     
-    private static final int intakeMotorId = 0;
+    private static final int intakeMotorId = 10;
         private static final boolean intakeMotorReversed = false;
         
             public RealIntake() {

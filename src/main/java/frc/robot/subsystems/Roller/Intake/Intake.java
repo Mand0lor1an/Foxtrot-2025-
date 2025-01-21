@@ -13,7 +13,6 @@ public class Intake{
                 
                 
                     private static IntakeIO simIntake() {
-                // TODO Auto-generated method stub
                 throw new UnsupportedOperationException("Unimplemented method 'simIntake'");
             }
         

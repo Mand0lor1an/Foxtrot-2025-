@@ -23,7 +23,6 @@ public class Rollers extends SubsystemBase{
         public enum Rollerstate {
             IDLE,
             INTAKING,
-            INDEXING,
             EJECTING,
             FEEDING
         }
@@ -45,29 +44,12 @@ public class Rollers extends SubsystemBase{
                         state = Rollerstate.IDLE;
                     break;
                 }
-                if (beamBreak.b_lower) {
-                    state = Rollerstate.INDEXING;
-                    break;
-                }
+
 
                 intake.setOutputPercentage(IntakextenderConstants.kIntakeMotorSpeed);
                 extender.setOutputPercentage(IntakextenderConstants.kExtenderMotorSpeed);
                 break;
 
-                case INDEXING:
-                    if (beamBreak.b_upper) {//False
-                        extender.setOutputPercentage(0);
-                        intake.setOutputPercentage(0);
-                        state = Rollerstate.IDLE;
-                        break;
-                    }
-
-                    intake.setOutputPercentage(IntakextenderConstants.kIntakeMotorSpeed);
-                extender.setOutputPercentage(IntakextenderConstants.kExtenderMotorSpeed);
-                break;
-
-
-    
                 case EJECTING:
                     intake.setOutputPercentage(-0.5);
                     extender.setOutputPercentage(-0.5);
