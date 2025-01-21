@@ -22,7 +22,7 @@ public class ShooterCommand extends Command {
 
     private State currentState = State.IDLE;
 
-    // State enumeration
+
     private enum State {
         IDLE,
         ACCELERATING,
@@ -85,7 +85,6 @@ public class ShooterCommand extends Command {
         return isFinished;
     }
 
-    // Handle the accelerating state
     private void handleAccelerating() {
         shooter.state = ShooterState.ACCELERATING;
 
@@ -103,7 +102,7 @@ public class ShooterCommand extends Command {
         }
     }
 
-    // Handle the preparing state
+
     private void handlePreparing() {
         rollers.state = Rollerstate.INTAKING;
 
@@ -112,7 +111,7 @@ public class ShooterCommand extends Command {
         }
     }
 
-    // Handle the shooting state
+
     private void handleShooting() {
         rollers.state = Rollerstate.FEEDING;
 
@@ -121,13 +120,13 @@ public class ShooterCommand extends Command {
         }
     }
 
-    // Transition to a new state
+
     private void transitionToState(State newState) {
         currentState = newState;
         stateStartTime = Timer.getFPGATimestamp();
     }
 
-    // Get time since the current state started
+
     private double timeSinceStateStart() {
         return Timer.getFPGATimestamp() - stateStartTime;
     }
