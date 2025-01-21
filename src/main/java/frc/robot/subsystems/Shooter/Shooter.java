@@ -13,6 +13,10 @@ public class Shooter extends SubsystemBase{
 
     private final ShooterIOInputsAutoLogged inputs = new ShooterIOInputsAutoLogged();
 
+    private static final double VELOCITY_TOLERANCE = 3.0;//çalışmadı amk
+    private static final double STEADY_TIME_THRESHOLD = 0.5;
+    private double steadyTime = 0.0;
+
     public static Shooter create() {
         return new Shooter(Robot.isReal() ? new RealShooter() : new NoShooter());    
     }
@@ -44,12 +48,21 @@ public class Shooter extends SubsystemBase{
             break;
 
             case ACCELERATING:
-                io.setVelocity(ShooterConstants.kSpeakerSpeedLeft, ShooterConstants.kSpeakerSpeedRight);
-                if (ShooterConstants.kSpeakerSpeedLeft - inputs.leftVelocityRps < 3 && ShooterConstants.kSpeakerSpeedRight + inputs.rightVelocityRps < 3) {
-                    SmartDashboard.putBoolean("shooterReady", true);
-                    state = ShooterState.READY;
-                }
-                break;
+    io.setVelocity(ShooterConstants.kSpeakerSpeedLeft, ShooterConstants.kSpeakerSpeedRight);
+
+    boolean leftWithinTolerance = Math.abs(ShooterConstants.kSpeakerSpeedLeft - inputs.leftVelocityRps) <= VELOCITY_TOLERANCE;
+    boolean rightWithinTolerance = Math.abs(ShooterConstants.kSpeakerSpeedRight - inputs.rightVelocityRps) <= VELOCITY_TOLERANCE;
+
+    if (leftWithinTolerance && rightWithinTolerance) {
+        steadyTime += 0.02; //delphide bir ağabey 20ms de bir çalışır yeğen demiş ona güvendim
+        if (steadyTime >= STEADY_TIME_THRESHOLD) {
+            SmartDashboard.putBoolean("Hazir", true);
+            state = ShooterState.READY;
+        }
+    } else {
+        steadyTime = 0.0;//fena olmadı he
+    }
+    break;
 
             case READY:
                 if (GlobalVariables.getInstance().nInside){

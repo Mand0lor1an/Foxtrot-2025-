@@ -45,6 +45,8 @@ public class RobotContainer {
     driverJoystick.leftTrigger(IntakextenderConstants.kIntakeDeadband).onFalse(runOnce(() -> Rollers.stopIfNotBusy()));
     driverJoystick.a().whileTrue(Rollers.setStateCommand(Rollerstate.EJECTING));
     driverJoystick.a().onFalse(runOnce(() -> Rollers.stopIfNotBusy()));
+    driverJoystick.y().whileTrue(new RepeatCommand(Rollers.setStateCommand(Rollerstate.FEEDING)));
+    driverJoystick.y().onFalse(runOnce(() -> Rollers.stopIfNotBusy()));
 
     }
 

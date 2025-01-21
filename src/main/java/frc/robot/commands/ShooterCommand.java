@@ -1,7 +1,5 @@
 package frc.robot.commands;
 
-import java.util.function.Supplier;
-
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
@@ -11,91 +9,126 @@ import frc.robot.subsystems.Shooter.Shooter.ShooterState;
 import frc.robot.subsystems.Roller.Rollers;
 import frc.robot.subsystems.Roller.Rollers.Rollerstate;
 
-public class ShooterCommand extends Command{
-    private final Supplier<Double> rightTrigger;
+public class ShooterCommand extends Command {
     private final Shooter shooter;
     private final Rollers rollers;
-    private boolean ending;
     private final XboxController operator;
 
-    public ShooterCommand(Supplier<Double> rightTrigger ,Shooter shooter, Rollers rollers,XboxController operator){
+    private boolean isFinished = false;
+    private double stateStartTime;
+
+    private static final double PREPARE_DURATION = 0.1; // Time for roller intake
+    private static final double SHOOT_DURATION = 1.5;  // Time for feeding balls
+
+    private State currentState = State.IDLE;
+
+    // State enumeration
+    private enum State {
+        IDLE,
+        ACCELERATING,
+        PREPARING,
+        SHOOTING,
+        DONE
+    }
+
+    public ShooterCommand(Shooter shooter, Rollers rollers, XboxController operator) {
         this.shooter = shooter;
         this.rollers = rollers;
-        this.rightTrigger = rightTrigger;
         this.operator = operator;
-        ending = false;
-        addRequirements(shooter); 
-    }
 
-    private enum State {
-        START,
-        PREPARE,
-        SHOOT,
-        END
+        addRequirements(shooter, rollers);
     }
-
-    private State state = State.START;
-    private double startTime;
 
     @Override
-    public void initialize(){
-        ending = false;
-        state = State.START;
-        shooter.state = ShooterState.ACCELERATING;
+    public void initialize() {
+        transitionToState(State.ACCELERATING);
     }
 
     @Override
     public void execute() {
-        double timeElapsed = Timer.getFPGATimestamp() - startTime;
+        switch (currentState) {
+            case ACCELERATING:
+                handleAccelerating();
+                break;
 
-        switch (state) {
-            case START:
-                if (shooter.state == ShooterState.READY) {
-                    if (rightTrigger.get() > 0.3) {
-                        operator.setRumble(RumbleType.kBothRumble, 0.5);
-                        startTime = Timer.getFPGATimestamp();//feedi ayarlayabilmek için
-                        state = State.PREPARE;
-                    } else {
-                        operator.setRumble(RumbleType.kBothRumble, 0);
-                    }
-                } else {
-                    if (rightTrigger.get() > 0.3) {
-                        operator.setRumble(RumbleType.kRightRumble, 1);//napıyon amk ayısı uyarısı
-                    } else { 
-                        operator.setRumble(RumbleType.kBothRumble, 0);
-                    }
-                }
+            case PREPARING:
+                handlePreparing();
                 break;
-            case PREPARE:
-                if (timeElapsed < 0.1) {
-                    rollers.state = Rollerstate.INTAKING;
-                } else {
-                    state = State.SHOOT;
-                }
+
+            case SHOOTING:
+                handleShooting();
                 break;
-            case SHOOT:
-                if (timeElapsed < 1.5) {
-                    rollers.state = Rollerstate.FEEDING;
-                } else {
-                    state = State.END;
-                }
+
+            case DONE:
+                isFinished = true;
                 break;
-            case END:
-                ending = true;
+
+            default:
                 break;
         }
+
+        if (operator.getBButton()) {
+            // Cancel command if B button is pressed
+            transitionToState(State.DONE);
+        }
     }
-    
+
     @Override
-    public void end(boolean interrupted){
-        state = State.START;
+    public void end(boolean interrupted) {
         shooter.state = ShooterState.IDLE;
         rollers.state = Rollerstate.IDLE;
+        operator.setRumble(RumbleType.kBothRumble, 0);
     }
 
     @Override
-    public boolean isFinished(){
-        return ending;
+    public boolean isFinished() {
+        return isFinished;
     }
 
+    // Handle the accelerating state
+    private void handleAccelerating() {
+        shooter.state = ShooterState.ACCELERATING;
+
+        if (shooter.state == ShooterState.READY) {
+            if (operator.getRightTriggerAxis() > 0.3) {
+                operator.setRumble(RumbleType.kBothRumble, 0.5); // Indicate readiness
+                transitionToState(State.PREPARING);
+            } else {
+                operator.setRumble(RumbleType.kBothRumble, 0); // No trigger input
+            }
+        } else if (operator.getRightTriggerAxis() > 0.3) {
+            operator.setRumble(RumbleType.kRightRumble, 1); // Warn if not ready
+        } else {
+            operator.setRumble(RumbleType.kBothRumble, 0);
+        }
+    }
+
+    // Handle the preparing state
+    private void handlePreparing() {
+        rollers.state = Rollerstate.INTAKING;
+
+        if (timeSinceStateStart() >= PREPARE_DURATION) {
+            transitionToState(State.SHOOTING);
+        }
+    }
+
+    // Handle the shooting state
+    private void handleShooting() {
+        rollers.state = Rollerstate.FEEDING;
+
+        if (timeSinceStateStart() >= SHOOT_DURATION) {
+            transitionToState(State.DONE);
+        }
+    }
+
+    // Transition to a new state
+    private void transitionToState(State newState) {
+        currentState = newState;
+        stateStartTime = Timer.getFPGATimestamp();
+    }
+
+    // Get time since the current state started
+    private double timeSinceStateStart() {
+        return Timer.getFPGATimestamp() - stateStartTime;
+    }
 }

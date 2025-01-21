@@ -19,6 +19,8 @@ public final class Constants {
         REPLAY
       }
       public static class ShooterConstants{
+
+
     
     public static final double kGearRatio = 1.0 / 11.357;
     public static final double kPivotMotorRot2Rad = kGearRatio * 2 * Math.PI;
