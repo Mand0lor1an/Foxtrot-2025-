@@ -17,8 +17,8 @@ public class ShooterCommand extends Command {
     private boolean isFinished = false;
     private double stateStartTime;
 
-    private static final double PREPARE_DURATION = 0.1; // Time for roller intake
-    private static final double SHOOT_DURATION = 1.5;  // Time for feeding balls
+    private static final double PREPARE_DURATION = 0.1;
+    private static final double SHOOT_DURATION = 1.5;
 
     private State currentState = State.IDLE;
 
@@ -91,13 +91,13 @@ public class ShooterCommand extends Command {
 
         if (shooter.state == ShooterState.READY) {
             if (operator.getRightTriggerAxis() > 0.3) {
-                operator.setRumble(RumbleType.kBothRumble, 0.5); // Indicate readiness
+                operator.setRumble(RumbleType.kBothRumble, 0.5);
                 transitionToState(State.PREPARING);
             } else {
-                operator.setRumble(RumbleType.kBothRumble, 0); // No trigger input
+                operator.setRumble(RumbleType.kBothRumble, 0);
             }
         } else if (operator.getRightTriggerAxis() > 0.3) {
-            operator.setRumble(RumbleType.kRightRumble, 1); // Warn if not ready
+            operator.setRumble(RumbleType.kRightRumble, 1);
         } else {
             operator.setRumble(RumbleType.kBothRumble, 0);
         }
