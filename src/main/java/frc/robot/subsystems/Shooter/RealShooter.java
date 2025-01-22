@@ -7,8 +7,7 @@ import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
-import edu.wpi.first.units.Measure;
-import edu.wpi.first.units.VoltageUnit;
+import edu.wpi.first.units.measure.Voltage;
 import frc.robot.Constants.ShooterConstants;
 import static edu.wpi.first.units.Units.*;
 
@@ -75,7 +74,8 @@ public class RealShooter implements ShooterIO{
 
         private final VoltageOut m_sysIdControl = new VoltageOut(0);
 
-        public void setSysIdVoltage(Measure<VoltageUnit> volts) {
+        @Override
+        public void setSysIdVoltage(Voltage volts) {
             rightMotor.setControl(m_sysIdControl.withOutput(volts.in(Volts)));
         }
 

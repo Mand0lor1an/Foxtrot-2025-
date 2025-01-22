@@ -7,6 +7,9 @@ import frc.robot.subsystems.BeamBreak;
 import frc.robot.subsystems.Roller.Intake.Intake;
 import frc.robot.subsystems.Roller.Rollers;
 import frc.robot.subsystems.Roller.Rollers.Rollerstate;
+import frc.robot.subsystems.Shooter.RealShooter;
+import frc.robot.subsystems.Shooter.Shooter;
+import frc.robot.subsystems.Shooter.Shooter.ShooterState;
 import frc.robot.subsystems.Roller.Extender.Extender;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import static edu.wpi.first.wpilibj2.command.Commands.runOnce;
@@ -15,38 +18,36 @@ import static edu.wpi.first.wpilibj2.command.Commands.runOnce;
 
 
 public class RobotContainer {
-
-
-
-
-
     private final CommandXboxController driverJoystick = new CommandXboxController(0);
     
-    private Intake Intake;
-    private BeamBreak BeamBreak;
-    private Extender Extender;
-    private Rollers Rollers;
+    private Intake intake;
+    private BeamBreak beamBreak;
+    private Extender extender;
+    private Rollers rollers;
+    private Shooter shooter;
+
+    public RobotContainer() {
 
                     
-                       /* */ public RobotContainer() {
-
-                    
-                                    Extender = frc.robot.subsystems.Roller.Extender.Extender.create();
-                                Intake = frc.robot.subsystems.Roller.Intake.Intake.create();
-                            BeamBreak = new BeamBreak();
-                        Rollers = new Rollers(Extender, Intake, BeamBreak);
+                                    extender = frc.robot.subsystems.Roller.Extender.Extender.create();
+                                intake = frc.robot.subsystems.Roller.Intake.Intake.create();
+                            beamBreak = new BeamBreak();
+                        rollers = new Rollers(extender, intake, beamBreak);
+                        shooter = new Shooter(new RealShooter());
 
         configureButtonBindings();
     }
     
 
     private void configureButtonBindings() {
-        driverJoystick.leftTrigger(IntakextenderConstants.kIntakeDeadband).whileTrue(new RepeatCommand(Rollers.setStateCommand(Rollerstate.INTAKING)));
-    driverJoystick.leftTrigger(IntakextenderConstants.kIntakeDeadband).onFalse(runOnce(() -> Rollers.stopIfNotBusy()));
-    driverJoystick.a().whileTrue(Rollers.setStateCommand(Rollerstate.EJECTING));
-    driverJoystick.a().onFalse(runOnce(() -> Rollers.stopIfNotBusy()));
-    driverJoystick.y().whileTrue(new RepeatCommand(Rollers.setStateCommand(Rollerstate.FEEDING)));
-    driverJoystick.y().onFalse(runOnce(() -> Rollers.stopIfNotBusy()));
+    driverJoystick.rightBumper().whileTrue(new RepeatCommand(shooter.setStateCommand(ShooterState.ACCELERATING)));
+    driverJoystick.rightBumper().onFalse(runOnce(() -> shooter.stopIfNotBusy()));
+    driverJoystick.leftTrigger(IntakextenderConstants.kIntakeDeadband).whileTrue(new RepeatCommand(rollers.setStateCommand(Rollerstate.INTAKING)));
+    driverJoystick.leftTrigger(IntakextenderConstants.kIntakeDeadband).onFalse(runOnce(() -> rollers.stopIfNotBusy()));
+    driverJoystick.a().whileTrue(rollers.setStateCommand(Rollerstate.EJECTING));
+    driverJoystick.a().onFalse(runOnce(() -> rollers.stopIfNotBusy()));
+    driverJoystick.y().whileTrue(new RepeatCommand(rollers.setStateCommand(Rollerstate.FEEDING)));
+    driverJoystick.y().onFalse(runOnce(() -> rollers.stopIfNotBusy()));
 
     }
 

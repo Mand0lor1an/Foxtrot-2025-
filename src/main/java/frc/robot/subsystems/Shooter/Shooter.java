@@ -4,6 +4,7 @@ import frc.robot.GlobalVariables;
 import frc.robot.Robot;
 import frc.robot.Constants.ShooterConstants;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.littletonrobotics.junction.Logger;
 
@@ -40,10 +41,7 @@ public class Shooter extends SubsystemBase{
 
         switch(state) {
             case IDLE:
-            if(GlobalVariables.getInstance().nInside) {
-                state = ShooterState.ACCELERATING;
-                break;
-            }
+
             io.setVelocity(0, 0);
             break;
 
@@ -52,6 +50,11 @@ public class Shooter extends SubsystemBase{
 
     boolean leftWithinTolerance = Math.abs(ShooterConstants.kSpeakerSpeedLeft - inputs.leftVelocityRps) <= VELOCITY_TOLERANCE;
     boolean rightWithinTolerance = Math.abs(ShooterConstants.kSpeakerSpeedRight - inputs.rightVelocityRps) <= VELOCITY_TOLERANCE;
+
+    if(!GlobalVariables.getInstance().nInside) {
+        state = ShooterState.IDLE;
+        break;
+    }
 
     if (leftWithinTolerance && rightWithinTolerance) {
         steadyTime += 0.02; //delphide bir ağabey 20ms de bir çalışır yeğen demiş ona güvendim
@@ -74,6 +77,16 @@ public class Shooter extends SubsystemBase{
 
 
     }
-
+    public Command setStateCommand(ShooterState state) {
+    return runOnce(() -> this.state = state);
+}
+public void stopIfNotBusy() {
+    if (this.state == ShooterState.ACCELERATING) {
+        this.state = ShooterState.ACCELERATING;
+    } else {
+        this.state = ShooterState.IDLE;
+    }
+    return;
+}
 
 }

@@ -1,7 +1,6 @@
 package frc.robot.subsystems.Shooter;
 
-import edu.wpi.first.units.Measure;
-import edu.wpi.first.units.VoltageUnit;
+import edu.wpi.first.units.measure.Voltage;
 
 public class NoShooter implements ShooterIO{
 
@@ -15,9 +14,11 @@ public class NoShooter implements ShooterIO{
         throw new UnsupportedOperationException("Unimplemented method 'neutralMotors'");
     }
 
-    @Override
-    public void setSysIdVoltage(Measure<VoltageUnit> volts) {
 
+    
+
+    @Override
+    public void setSysIdVoltage(Voltage volts) {
         throw new UnsupportedOperationException("Unimplemented method 'setSysIdVoltage'");
     }
     
