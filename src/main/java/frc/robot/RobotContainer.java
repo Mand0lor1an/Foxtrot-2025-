@@ -7,7 +7,6 @@ import frc.robot.subsystems.BeamBreak;
 import frc.robot.subsystems.Roller.Intake.Intake;
 import frc.robot.subsystems.Roller.Rollers;
 import frc.robot.subsystems.Roller.Rollers.Rollerstate;
-import frc.robot.subsystems.Shooter.RealShooter;
 import frc.robot.subsystems.Shooter.Shooter;
 import frc.robot.subsystems.Shooter.Shooter.ShooterState;
 import frc.robot.subsystems.Roller.Extender.Extender;
