@@ -33,7 +33,7 @@ public class RobotContainer {
                                 intake = frc.robot.subsystems.Roller.Intake.Intake.create();
                             beamBreak = new BeamBreak();
                         rollers = new Rollers(extender, intake, beamBreak);
-                        shooter = new Shooter(new RealShooter());
+                        shooter = Shooter.create();
 
         configureButtonBindings();
     }

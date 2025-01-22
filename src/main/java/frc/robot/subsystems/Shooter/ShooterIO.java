@@ -2,8 +2,7 @@ package frc.robot.subsystems.Shooter;
 
 import org.littletonrobotics.junction.AutoLog;
 
-import edu.wpi.first.units.Measure;
-import edu.wpi.first.units.VoltageUnit;
+import edu.wpi.first.units.measure.Voltage;
 
 
 public interface ShooterIO {
@@ -14,7 +13,7 @@ public interface ShooterIO {
     
     
 
-    public void setSysIdVoltage(Measure<VoltageUnit> volts);
+    public void setSysIdVoltage(Voltage volts);
     @AutoLog
      class ShooterIOInputs {
         public boolean leftMotorConnected = true;
